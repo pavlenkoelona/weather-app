@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.5s;
+        }
+        body.error {
+            background: linear-gradient(135deg, #bdc3c7, #2c3e50);
+        }
+        body.weather-clear {
+            background: linear-gradient(135deg, #f5f7fa, #87ceeb);
+        }
+        body.weather-clouds {
+            background: linear-gradient(135deg, #d3cce3, #636e72);
+        }
+        body.weather-rain {
+            background: linear-gradient(135deg, #4b79a1, #283e51);
+            animation: rain 2s infinite;
+        }
+        body.weather-snow {
+            background: linear-gradient(135deg, #e6dada, #274046);
+        }
+        body.weather-thunderstorm {
+            background: linear-gradient(135deg, #1e272e, #485460);
+        }
+        @keyframes rain {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100%; }
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .weather-info p {
+            font-size: 1.2em;
+            color: #555;
+            margin: 10px 0;
+        }
+        form {
+            display: flex;
+            gap: 10px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            flex: 1;
+            outline: none;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: #e74c3c;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body class="{% if error %}error{% elif weather_type %}weather-{{ weather_type }}{% endif %}">
+    <div class="container">
+        <h1>Weather in {{ city }}</h1>
+        <p>Debug: {{ weather_type }} (Status: {{ status_code|default:'N/A' }})</p>
+        <div class="weather-info">
+            {% if error %}
+                <p class="error">{{ error }}</p>
+            {% else %}
+                <p>Temperature: {{ temperature }}°C</p>
+                <p>Description: {{ description }}</p>
+            {% endif %}
+        </div>
+        <form method="get">
+            <input type="text" name="city" placeholder="Enter a city" value="{{ city }}">
+            <button type="submit">Check Weather</button>
+        </form>
+    </div>
+</body>
+</html>
