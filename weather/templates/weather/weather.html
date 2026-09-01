@@ -3,105 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather App</title>
+    <meta name="description" content="A Django weather dashboard powered by OpenWeather.">
+    <title>{{ city }} weather | Weather App</title>
     <style>
+        :root { color-scheme: light; }
+        * { box-sizing: border-box; }
         body {
-            font-family: Arial, sans-serif;
-            height: 100vh;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: background 0.5s;
+            min-height: 100vh; margin: 0; padding: 24px; display: grid; place-items: center;
+            font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #2563eb); transition: background .4s;
         }
-        body.error {
-            background: linear-gradient(135deg, #bdc3c7, #2c3e50);
+        body.weather-clear { background: linear-gradient(135deg, #f59e0b, #38bdf8); }
+        body.weather-clouds { background: linear-gradient(135deg, #64748b, #cbd5e1); }
+        body.weather-rain { background: linear-gradient(135deg, #1e3a8a, #0f172a); }
+        body.weather-snow { background: linear-gradient(135deg, #e2e8f0, #60a5fa); }
+        .card {
+            width: min(100%, 460px); padding: 40px; border: 1px solid rgba(255,255,255,.35);
+            border-radius: 28px; background: rgba(255,255,255,.9); box-shadow: 0 24px 70px rgba(15,23,42,.3);
+            backdrop-filter: blur(16px);
         }
-        body.weather-clear {
-            background: linear-gradient(135deg, #f5f7fa, #87ceeb);
-        }
-        body.weather-clouds {
-            background: linear-gradient(135deg, #d3cce3, #636e72);
-        }
-        body.weather-rain {
-            background: linear-gradient(135deg, #4b79a1, #283e51);
-            animation: rain 2s infinite;
-        }
-        body.weather-snow {
-            background: linear-gradient(135deg, #e6dada, #274046);
-        }
-        body.weather-thunderstorm {
-            background: linear-gradient(135deg, #1e272e, #485460);
-        }
-        @keyframes rain {
-            0% { background-position: 0 0; }
-            100% { background-position: 0 100%; }
-        }
-        .container {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-        .weather-info p {
-            font-size: 1.2em;
-            color: #555;
-            margin: 10px 0;
-        }
-        form {
-            display: flex;
-            gap: 10px;
-        }
-        input[type="text"] {
-            padding: 10px;
-            font-size: 1em;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            flex: 1;
-            outline: none;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 1em;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .error {
-            color: #e74c3c;
-            font-size: 1.1em;
-        }
+        .eyebrow { margin: 0 0 8px; color: #2563eb; font-size: .75rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+        h1 { margin: 0; color: #0f172a; font-size: clamp(2rem, 8vw, 3.5rem); }
+        .temperature { margin: 20px 0 0; color: #0f172a; font-size: 4rem; font-weight: 800; }
+        .description { margin: 0 0 28px; color: #475569; font-size: 1.15rem; text-transform: capitalize; }
+        form { display: flex; gap: 10px; }
+        input, button { min-height: 48px; border-radius: 12px; font: inherit; }
+        input { min-width: 0; flex: 1; padding: 0 14px; border: 1px solid #cbd5e1; }
+        button { padding: 0 18px; border: 0; background: #2563eb; color: white; font-weight: 700; cursor: pointer; }
+        button:hover { background: #1d4ed8; }
+        .error { margin: 22px 0; padding: 14px; border-radius: 12px; background: #fee2e2; color: #991b1b; }
+        @media (max-width: 460px) { .card { padding: 28px; } form { flex-direction: column; } }
     </style>
 </head>
-<body class="{% if error %}error{% elif weather_type %}weather-{{ weather_type }}{% endif %}">
-    <div class="container">
-        <h1>Weather in {{ city }}</h1>
-        <p>Debug: {{ weather_type }} (Status: {{ status_code|default:'N/A' }})</p>
-        <div class="weather-info">
-            {% if error %}
-                <p class="error">{{ error }}</p>
-            {% else %}
-                <p>Temperature: {{ temperature }}°C</p>
-                <p>Description: {{ description }}</p>
-            {% endif %}
-        </div>
-        <form method="get">
-            <input type="text" name="city" placeholder="Enter a city" value="{{ city }}">
-            <button type="submit">Check Weather</button>
+<body class="{% if weather_type %}weather-{{ weather_type }}{% endif %}">
+    <main class="card">
+        <p class="eyebrow">Live weather</p>
+        <h1>{{ city }}</h1>
+        {% if error %}
+            <p class="error" role="alert">{{ error }}</p>
+        {% else %}
+            <p class="temperature">{{ temperature|floatformat:1 }}°</p>
+            <p class="description">{{ description }}</p>
+        {% endif %}
+        <form method="get" aria-label="Search weather by city">
+            <input type="text" name="city" placeholder="Search a city" value="{{ city }}" aria-label="City" required>
+            <button type="submit">Search</button>
         </form>
-    </div>
+    </main>
 </body>
 </html>
